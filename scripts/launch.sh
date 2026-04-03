@@ -434,11 +434,24 @@ if ! check_server $CURRENT_PORT; then
   exit 1
 fi
 
+echo -e "${BLUE}⏳ Waiting for Remotion to compile your animation...${NC}"
+COMPILE_WAIT=0
+while [ $COMPILE_WAIT -lt 15 ]; do
+  sleep 2
+  COMPILE_WAIT=$((COMPILE_WAIT + 2))
+  if curl -s "http://localhost:$CURRENT_PORT" | grep -q "Remotion"; then
+    echo -e "${GREEN}✅ Compilation complete!${NC}"
+    break
+  fi
+  echo -e "${BLUE}   Still compiling... ($COMPILE_WAIT/15s)${NC}"
+done
+
 # Get local IP
 LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
 
-# Auto-open browser
-sleep 2
+# Auto-open browser - now all code is ready
+echo -e "${GREEN}🌐 Opening preview in browser...${NC}"
+sleep 1
 open "http://localhost:$CURRENT_PORT"
 
 echo ""
